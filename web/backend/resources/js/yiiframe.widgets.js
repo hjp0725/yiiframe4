@@ -1,5 +1,5 @@
-let echartsList = [];
-let echartsListConfig = [];
+window.echartsList = [];
+window.echartsListConfig = [];
 // ----------------------------------- 文件上传 ----------------------------------- //
 
 // 显示蒙版

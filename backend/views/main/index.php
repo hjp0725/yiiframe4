@@ -16,9 +16,6 @@ AppAsset::register($this);
     <head>
         <meta charset="<?= Yii::$app->charset ?>">
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-        <!-- Google Font: Source Sans Pro -->
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
-
         <?php $this->registerCsrfMetaTags() ?>
         <title><?= Html::encode(Yii::$app->params['adminTitle']);?></title>
         <?php $this->head() ?>

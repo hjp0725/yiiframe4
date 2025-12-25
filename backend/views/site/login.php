@@ -120,7 +120,10 @@ $this->title = Yii::$app->params['adminTitle'];
     if (window.parent !== this.window) {
         parent.location.reload();
     }
-
+    window.config = window.config || {
+        isMobile: false,
+        tag: true
+    };
 </script>
 <?php $this->endBody() ?>
 </body>
