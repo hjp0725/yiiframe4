@@ -4,6 +4,7 @@ namespace common\widgets\jstree;
 
 use yii\helpers\Json;
 use yii\widgets\InputWidget;
+use common\enums\StatusEnum;
 use common\widgets\jstree\assets\AppAsset;
 
 /**
@@ -21,30 +22,49 @@ class JsTreeTable extends InputWidget
      * @var
      */
     public $name;
+
     /**
      * @var string
      */
     public $theme = 'table';
+
+    /**
+     * ajax 加载数据
+     *
+     * @var bool
+     */
+    public $ajax = false;
+
     /**
      * 默认数据
      *
      * @var array
      */
     public $defaultData = [];
+
     /**
-     * 编辑地址
+     * 列表
+     *
+     * @var
+     */
+    public $listUrl;
+
+    /**
+     * 编辑
      *
      * @var string
      */
     public $editUrl;
+
     /**
-     * 删除地址
+     * 删除
      *
      * @var string
      */
     public $deleteUrl;
+
     /**
-     * 移动地址
+     * 移动
      *
      * @var string
      */
@@ -59,15 +79,15 @@ class JsTreeTable extends InputWidget
 
         $defaultData = $this->defaultData;
         $jsTreeData = [];
-        foreach ($defaultData as $datum) {
-            $data = [
-                'id' => $datum['id'],
-                'parent' => !empty($datum['pid']) ? $datum['pid'] : '#',
-                'text' => trim($datum['title']),
-                'icon' => 'glyphicon glyphicon-folder-close'
-            ];
-
-            $jsTreeData[] = $data;
+        if (!empty($defaultData)) {
+            foreach ($defaultData as $datum) {
+                $jsTreeData[] = [
+                    'id' => $datum['id'],
+                    'parent' => !empty($datum['pid']) ? $datum['pid'] : '#',
+                    'text' => trim($datum['title']),
+                    'icon' => 'fa fa-folder'
+                ];
+            }
         }
 
         return $this->render($this->theme, [
@@ -76,7 +96,9 @@ class JsTreeTable extends InputWidget
             'editUrl' => $this->editUrl,
             'deleteUrl' => $this->deleteUrl,
             'moveUrl' => $this->moveUrl,
-            'defaultData' => Json::encode($jsTreeData),
+            'listUrl' => $this->listUrl,
+            'ajax' => $this->ajax == false ? StatusEnum::DISABLED : StatusEnum::ENABLED,
+            'jsTreeData' => Json::encode($jsTreeData),
         ]);
     }
 

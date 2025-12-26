@@ -22,23 +22,24 @@
     .jstree-default .node-icon {
         padding-left: 8px;
     }
+    .jstree-anchor {
+        padding-right: 70px;
+    }
 </style>
 
 <div class="row">
-    <div class="col-sm-3">
+    <div class="col-3">
         <div class="box">
             <div class="box-header">
                 <h3 class="box-title"><?= $title; ?></h3>
                 <div class="box-tools">
-                    <button class="btn btn-primary btn-xs" onclick="nodeCreate()"><i class="icon ion-plus"></i> 创建
-                    </button>
+                    <button class="btn btn-primary btn-xs" onclick="nodeCreate()"><i class="icon ion-plus"></i> 创建</button>
                 </div>
             </div>
             <div class="box-body table-responsive">
                 <!-- 描述：搜索框 -->
                 <div class="input-group m-b">
-                    <span class="input-group-addon" id="basic-addon1"><i class="fa fa-search"></i></span>
-                    <input type="text" class="form-control" placeholder="请输入关键字..." id="search_ay"
+                    <input type="text" class="form-control" placeholder="请输入搜索关键字..." id="search_ay"
                            aria-describedby="basic-addon1">
                 </div>
                 <div id="<?= $name; ?>"></div>
@@ -48,13 +49,10 @@
             </div>
         </div>
     </div>
-    <div class="col-sm-9">
+    <div class="col-9">
         <div class="box">
             <div class="box-header">
-                <h2 style="font-size: 18px;padding-top: 0;margin-top: 0">
-                    <i class="icon ion-android-apps"></i>
-                    基本信息
-                </h2>
+                <h3 class="box-title">基本信息 <span class="jstree-table-id"></span></h3>
             </div>
             <div class="box-body">
                 <div class="col-lg-12" id="container">
@@ -70,10 +68,11 @@
 <?php
 $this->registerJs(<<<JS
     var treeId = $name;
+    var ajax = '$ajax';
     var editUrl = '$editUrl';
     var deleteUrl = '$deleteUrl';
     var treeCheckIds = JSON.parse('[]');
-    var treeData = $defaultData;
+    var treeData = $jsTreeData;
     
     showCheckboxTree(treeData, $(treeId).attr('id'), treeCheckIds);
     
@@ -97,7 +96,12 @@ $this->registerJs(<<<JS
         }).jstree({
             "core": {
                 "check_callback" : true,
-                "data": data,
+                'data' : parseInt(ajax) === 0 ? data : {
+                    "url" : "$listUrl",
+                    "data" : function (node) {
+                      return {"pid" : node.id === '#' ? 0 : node.id}
+                 }
+                },
                 "attr": {
                     "class": "jstree-checked"
                 }
@@ -127,7 +131,7 @@ $this->registerJs(<<<JS
                     "valid_children": ["default", "file"]
                 },
                 "file": {
-                    "icon": "glyphicon glyphicon-file",
+                    "icon": "fa fa-folder-file",
                     "valid_children": []
                 }
             },
@@ -158,12 +162,12 @@ $this->registerJs(<<<JS
         // 监听打开事件
         that.on("open_node.jstree", function(e,data){ 
             var currentNode = data.node;  
-            data.instance.set_icon(currentNode, "glyphicon glyphicon-folder-open"); 
+            data.instance.set_icon(currentNode, "fa fa-folder-open"); 
         });
         // 监听关闭事件 
         that.on("close_node.jstree", function(e,data){ 
             var currentNode = data.node;  
-            data.instance.set_icon(currentNode, "glyphicon glyphicon-folder-close"); 
+            data.instance.set_icon(currentNode, "fa fa-folder"); 
         });
         // 鼠标移出事件
         that.on('dehover_node.jstree', function (e,data) { 
@@ -172,7 +176,7 @@ $this->registerJs(<<<JS
         // 鼠标移上事件
         that.on('hover_node.jstree', function (e,data) { 
             var node = data.node.original;
-            $('#' + node.id + '_anchor').append("<i class='fa fa-plus node-icon node-create' onclick='nodeCreateChild(" + node.id + ")' title='创建'></i><i class='fa fa-pencil-square-o node-icon node-create' onclick='nodeEdit(" + node.id + ")'  title='编辑'></i><i class='fa fa-trash node-icon node-delete' onclick='nodeDelete(" + node.id + ")'  title='删除'></i>")
+            $('#' + node.id + '_anchor').append("<i class='fa fa-plus node-icon node-create' onclick='nodeCreateChild(" + node.id + ")' title='创建'></i><i class='fa fa-edit node-icon node-create' onclick='nodeEdit(" + node.id + ")'  title='编辑'></i><i class='fa fa-trash node-icon node-delete' onclick='nodeDelete(" + node.id + ")'  title='删除'></i>")
     
             console.log(data.node);
         });
@@ -200,22 +204,22 @@ $this->registerJs(<<<JS
     
         });
         
-          // 创建
+        // 创建
         that.on("create_node.jstree", function(e, data){
-           // alert("创建node节点");
+
         });
     
         // 修改
         that.on("rename_node.jstree", function(e, data){
-          // alert("修改node节点");
+
         });
     
         // 删除
         that.on("delete_node.jstree", function(e, data){
-           // alert("删除node节点");
+
         });
         
-            // 查询节点名称
+        // 查询节点名称
         var to = false;
         $("#search_ay").keyup(function(){
             if(to){
@@ -284,7 +288,7 @@ JS
         layer.load(2);
 
         isNodeNewRecord = false;
-        $('.jstree-table-id').text('- ID: ' + id);
+        $('.jstree-table-id').html('<small>ID: ' + id + '</small>');
 
         $.ajax({
             type: "get",
@@ -368,7 +372,7 @@ JS
                             "text": res.title // 节点文本
                         });
 
-                        $('.jstree-table-id').text('- ID: ' + res.id);
+                        $('.jstree-table-id').html('<small>ID: ' + res.id + '</small>');
                     }
 
                     swal("操作成功", "一个基于Yii2的安全、高效的开发框架", "success");
