@@ -28,20 +28,22 @@ $this->params['breadcrumbs'][] = ['label' => $this->title];
                 <?= $form->field($model, 'title')->textInput(); ?>
                 <?= $form->field($model, 'status')->radioList(StatusEnum::getMap()); ?>
                 <?= $form->field($model, 'sort')->textInput(); ?>
-                <div class="col-sm-2"></div>
-                <div class="col-sm-5">
+                <div class="row">
+                <div class="col-2 col-sm-2"></div>
+                   <div class="col-5 col-sm-5">
                     <?= \common\widgets\jstree\JsTree::widget([
                         'name' => "userTree",
                         'defaultData' => $defaultFormAuth,
                         'selectIds' => $defaultCheckIds,
                     ]) ?>
                 </div>
-                <div class="col-sm-5">
+                <div class="col-5 col-sm-5">
                     <?= \common\widgets\jstree\JsTree::widget([
                         'name' => "plugTree",
                         'defaultData' => $addonsFormAuth,
                         'selectIds' => $addonsCheckIds,
                     ]) ?>
+                </div>
                 </div>
             </div>
             <!-- /.box-body -->
