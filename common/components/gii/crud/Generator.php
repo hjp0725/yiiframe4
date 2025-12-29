@@ -52,6 +52,7 @@ class Generator extends \yiiframe\gii\generators\crud\Generator
             'datetime' => Yii::t('app','日期时间'),
             'color' => Yii::t('app','颜色'),
             'dropDownList' => Yii::t('app','下拉框'),
+            'Select2' => Yii::t('app','多选下拉框'),
             'multipleInput' => Yii::t('app','Input组'),
             'radioList' => Yii::t('app','单选按钮'),
             'checkboxList' => Yii::t('app','复选框'),
@@ -178,6 +179,7 @@ class Generator extends \yiiframe\gii\generators\crud\Generator
             case 'dropDownList':
             case 'radioList':
             case 'checkboxList':
+            case 'Select2':
                 /* 1. 先读注释 */
                 $tableSchema = $this->getTableSchema();
                 $column      = $tableSchema->columns[$attribute];
@@ -217,6 +219,14 @@ class Generator extends \yiiframe\gii\generators\crud\Generator
                         return "\$form->field(\$model, '$attribute')->radioList({$mapCode})";
                     case 'checkboxList':
                         return "\$form->field(\$model, '$attribute')->checkboxList({$mapCode})";
+                    case 'Select2':
+                        return "\$form->field(\$model, '$attribute')->widget(Select2::class, [
+                            'data' => {$mapCode},
+                            'options' => ['placeholder' => Yii::t('app','请选择'),'multiple' => true],
+                            'pluginOptions' => [
+                                'allowClear' => true
+                            ],
+                        ])";  
                 }
                 break;
 
@@ -305,7 +315,7 @@ class Generator extends \yiiframe\gii\generators\crud\Generator
                                     'multiple' => false,
                                 ],
                             ]
-                    ])->label(Yii::t('app','图片上传'));";
+                    ]);";
                 else
                 return "\$form->field(\$model, '$attribute')->textInput()";
                 break;
@@ -322,7 +332,7 @@ class Generator extends \yiiframe\gii\generators\crud\Generator
                                     'multiple' => true,
                                 ],
                             ]
-                    ])->label(Yii::t('app','多图上传'));";
+                    ]);";
                 else
                 return "\$form->field(\$model, '$attribute')->textInput()";
                 break;
@@ -339,7 +349,7 @@ class Generator extends \yiiframe\gii\generators\crud\Generator
                                     'multiple' => false,
                                 ],
                             ]
-                    ])->label(Yii::t('app','文件上传'));";
+                    ]);";
                 else
                 return "\$form->field(\$model, '$attribute')->textInput()";
                 break;
@@ -356,7 +366,7 @@ class Generator extends \yiiframe\gii\generators\crud\Generator
                                     'multiple' => true,
                                 ],
                             ]
-                    ])->label(Yii::t('app','多文件上传'));";
+                    ]);";
                 else
                 return "\$form->field(\$model, '$attribute')->textInput()";
                 break;

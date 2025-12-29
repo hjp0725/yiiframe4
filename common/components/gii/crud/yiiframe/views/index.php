@@ -125,7 +125,50 @@ if (($tableSchema = $generator->getTableSchema()) === false) {
         /* 1. 控件类型是否可下拉 */
         /* 先拆出控件类型 */
         list($type,$linkTable) = array_pad(explode('|', $generator->inputType[$column->name] ?? ''), 2, '');
-        
+        /* ======  新增：Select2 多选列  ====== */
+        if ($type === 'Select2') {
+            // 1. 取关联表（或会员模型）做下拉选项
+            if (!empty($linkTable)) {
+                $modelClass = $generator->getRelationModelClass($linkTable);
+                $itemsCode  = "{$modelClass}::dropDown()";
+            } else {
+                // 1-2 无关联表 → 解析备注
+                $map = $generator->parseCommentToMap($column->comment);
+                if (!empty($map)) {
+                    $itemsCode = '[' . implode(', ', array_map(
+                        function ($k, $v) { return "'{$k}' => '{$v}'"; },
+                        array_keys($map),
+                        $map
+                    )) . ']';
+                } else {
+                    // 1-3 没备注 → 默认「是/否」
+                    $itemsCode = "['1' => '选项1', '2' => '选项2']";
+                }
+            }
+
+            // 2. 输出 GridView 列
+            echo "            [\n";
+            echo "                'attribute' => '{$column->name}',\n";
+            echo "                'value' => function (\$model) {\n";
+            echo "                    \$ids = is_array(\$model->{$column->name})\n";
+            echo "                           ? \$model->{$column->name}\n";
+            echo "                           : json_decode(\$model->{$column->name}, true);\n";
+            echo "                    if (!is_array(\$ids) || !\$ids) return Yii::t('app','未知');\n";
+            echo "                    \$map   = {$itemsCode};\n";
+            echo "                    \$names = array_filter(array_map(function (\$id) use (\$map) {\n";
+            echo "                        return \$map[\$id] ?? '';\n";
+            echo "                    }, \$ids));\n";
+            echo "                    return \$names ? implode(', ', \$names) : Yii::t('app','未知');\n";
+            echo "                },\n";
+            echo "                'filter' => Html::dropDownList(\n";
+            echo "                    '{$column->name}',\n";
+            echo "                    Yii::\$app->request->get('{$column->name}'),\n";
+            echo "                    {$itemsCode},\n";
+            echo "                    ['prompt' => Yii::t('addon','全部'), 'class' => 'form-control', 'onchange' => 'this.form.submit()']\n";
+            echo "                ),\n";
+            echo "            ],\n";
+            continue;   // 已经处理完，直接下一轮
+        }
         if (in_array($type, $mapable)) {
             // 1-1 先查是否指定了关联表
             if (!empty($linkTable)) {
