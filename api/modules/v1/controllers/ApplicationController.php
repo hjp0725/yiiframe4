@@ -100,43 +100,37 @@ class ApplicationController extends OnAuthController
      */
     private function buildTreeWithAddonTop(array $menus, string $appId): array
     {
-        // ① 先按真实 pid 归并一次（以 0 为根）
+        // 1. 先把真实树拼出来（pid>0 的已经带层级）
         $realTree = ArrayHelper::itemsMerge($menus, 0, 'id', 'pid', 'list');
 
-        // ② 取插件信息（仅给「无子级」顶级用）
+        // 2. 按插件归并「pid=0」的顶级菜单
+        $addonTop = [];                                 // 以 addons_name 为 key
+        foreach ($realTree as $top) {
+            if ($top['pid'] == 0 && empty($top['list'])) {   // 无子的顶级
+                $addonTop[$top['addons_name']][] = $top;
+            }
+        }
+
+        // 3. 每个插件只生成一个壳，把同插件所有顶级菜单收进去
         $addonMap = ArrayHelper::map(
             Addons::find()->select(['name', 'title', 'icon'])
                 ->where(['status' => StatusEnum::ENABLED])
                 ->all(),
-            'name',
-            'title'
+            'name', 'title'
         );
 
-        // ③ 逐个判断「有子 / 无子」
-        $tree = [];
-        foreach ($realTree as $topNode) {
-            if ($topNode['pid'] != 0) {
-                continue;   // 理论上不会进，保险
-            }
-
-            // 有子级 → 直接当顶级
-            if (!empty($topNode['list'])) {
-                $tree[] = $topNode;
-                continue;
-            }
-
-            // 无子级 → 套插件壳
-            $addonName = $topNode['addons_name'];
-            $node = [
-                'id'          => 'addon-' . md5($addonName . $appId . time()),
-                'title'       => $addonMap[$addonName] ?? $addonName,
+        $result = [];
+        foreach ($addonTop as $aname => $items) {
+            $result[] = [
+                'id'          => 'addon-' . md5($aname . $appId),
+                'title'       => $addonMap[$aname] ?? $aname,
                 'app_id'      => $appId,
-                'addons_name' => $addonName,
+                'addons_name' => $aname,
                 'is_addon'    => 1,
                 'cate_id'     => 0,
                 'pid'         => 0,
-                'url'         => '',                      // 顶级无路由
-                'icon'        => 'fa fa-puzzle-piece',    // 如需图标再查
+                'url'         => '',
+                'icon'        => 'fa fa-puzzle-piece',   // 也可读插件表里的 icon
                 'level'       => 1,
                 'dev'         => 0,
                 'sort'        => 999,
@@ -145,12 +139,18 @@ class ApplicationController extends OnAuthController
                 'status'      => StatusEnum::ENABLED,
                 'created_at'  => time(),
                 'updated_at'  => time(),
-                'list'        => [$topNode],   // 把原菜单挂进来（单叶子）
+                'list'        => $items,   // 多条顶级菜单一次性挂进来
             ];
-            $tree[] = $node;
         }
 
-        return $tree;
+        // 4. 原来「有子级」的顶级节点直接保留
+        foreach ($realTree as $top) {
+            if ($top['pid'] == 0 && !empty($top['list'])) {
+                $result[] = $top;
+            }
+        }
+
+        return $result;
     }
 
     /**

@@ -73,6 +73,7 @@ class MemberController extends BaseController
         $request = Yii::$app->request;
         $model   = new MemberForm();
         $model->id = $request->get('id');
+        $model->type = 1;
         $model->loadData();
         // 非超管走通用场景
         if ((int)$model->id !== (int)Yii::$app->params['adminAccount']) {

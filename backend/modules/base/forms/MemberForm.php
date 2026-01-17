@@ -21,6 +21,7 @@ class MemberForm extends Model
     public $mobile;
     public $title;
     public $role_id;
+    public $type;
     public $department_id;
 
     /**
@@ -45,6 +46,8 @@ class MemberForm extends Model
             ],
             [['username'], 'isUnique'],
             [['role_id'], 'required'],
+            [['type'], 'integer'],
+
         ];
     }
 
@@ -59,6 +62,7 @@ class MemberForm extends Model
             'title'      => Yii::t('app', '姓名'),
             'mobile'        => Yii::t('app', '手机'),
             'role_id'       => Yii::t('app', '角色'),
+            'type'       => Yii::t('app', '类型'),
             'department_id' => Yii::t('app', '部门'),
         ];
     }
@@ -119,6 +123,7 @@ class MemberForm extends Model
             $member->mobile       = $this->mobile;
             $member->department_id = $this->department_id;
             $member->role_id       = $this->role_id;
+            $member->type       = $this->type;
 
             // 密码被修改时重新哈希
             if ($member->password_hash !== $this->password) {

@@ -5,7 +5,6 @@ use common\helpers\Html;
 use common\helpers\ArrayHelper;
 use common\helpers\ImageHelper;
 use common\enums\AppEnum;
-use common\widgets\notify\Notify;
 use common\enums\ThemeLayoutEnum;
 use common\enums\StatusEnum;
 

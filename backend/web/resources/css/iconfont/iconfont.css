@@ -1,11 +1,11 @@
 @font-face {
   font-family: "iconfont"; /* Project id 1823374 */
-  src: url('iconfont.eot?t=1765524920808'); /* IE9 */
-  src: url('iconfont.eot?t=1765524920808#iefix') format('embedded-opentype'), /* IE6-IE8 */
-       url('iconfont.woff2?t=1765524920808') format('woff2'),
-       url('iconfont.woff?t=1765524920808') format('woff'),
-       url('iconfont.ttf?t=1765524920808') format('truetype'),
-       url('iconfont.svg?t=1765524920808#iconfont') format('svg');
+  src: url('iconfont.eot?t=1768552332695'); /* IE9 */
+  src: url('iconfont.eot?t=1768552332695#iefix') format('embedded-opentype'), /* IE6-IE8 */
+       url('iconfont.woff2?t=1768552332695') format('woff2'),
+       url('iconfont.woff?t=1768552332695') format('woff'),
+       url('iconfont.ttf?t=1768552332695') format('truetype'),
+       url('iconfont.svg?t=1768552332695#iconfont') format('svg');
 }
 
 .iconfont {
@@ -14,6 +14,14 @@
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.iconqiandao:before {
+  content: "\e67a";
+}
+
+.iconqiantui:before {
+  content: "\e68b";
 }
 
 .icontuichu:before {

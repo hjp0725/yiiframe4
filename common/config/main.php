@@ -103,5 +103,6 @@ return [
         'httpClient' => [
             'class' => 'yii\httpclient\Client',
         ],
+        
     ],
 ];

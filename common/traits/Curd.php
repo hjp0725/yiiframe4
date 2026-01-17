@@ -8,7 +8,6 @@ use yii\db\ActiveRecord;
 use common\helpers\ArrayHelper;
 use common\helpers\ResultHelper;
 use common\enums\StatusEnum;
-use common\models\base\SearchModel;
 
 /**
  * 通用增删改查（Curd）复用逻辑
@@ -38,7 +37,7 @@ trait Curd
      */
     public function actionIndex()
     {
-        $searchModel = new SearchModel([
+        $searchModel = new \common\models\base\SearchModel([
             'model'                  => $this->modelClass,
             'scenario'               => 'default',
             'relations' => ['member' => ['title']], 
@@ -47,6 +46,11 @@ trait Curd
             'pageSize'               => $this->pageSize,
         ]);
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        $dataProvider->query->andWhere([$this->modelClass::tableName() .'.status'=>\common\enums\StatusEnum::ENABLED]);
+        $dataProvider->query->andFilterWhere([$this->modelClass::tableName() .'.merchant_id'=>Yii::$app->user->identity->merchant_id]);
+        if (!Yii::$app->services->auth->isSuperAdmin()&&!Yii::$app->services->auth->isSystemAdmin()) {
+            $dataProvider->query->andWhere([$this->modelClass::tableName(). '.member_id' => Yii::$app->user->id]);
+        }
         return $this->render($this->action->id, [
             'dataProvider' => $dataProvider,
             'searchModel'  => $searchModel,

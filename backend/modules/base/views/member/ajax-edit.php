@@ -26,6 +26,8 @@ $form = ActiveForm::begin([
     <?= $form->field($model, 'department_id')->dropDownList($departments, [
         'prompt' => Yii::t('app', '请选择'),
     ]) ?>
+    <?= $form->field($model, 'type')->radioList([1=>'普通用户',10=>'管理员']) ?>
+    
 </div>
 <div class="modal-footer">
     <button type="button" class="btn btn-white" data-dismiss="modal"><?=Yii::t('app', '关闭');?></button>

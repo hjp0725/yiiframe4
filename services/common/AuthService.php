@@ -27,7 +27,7 @@ class AuthService extends Service
         return (int) Yii::$app->user->id === (int) Yii::$app->params['adminAccount'];
     }
     /**
-     * 是否超级管理员
+     * 是否系统管理员
      * @return bool
      */
     public function isSystemAdmin(): bool
