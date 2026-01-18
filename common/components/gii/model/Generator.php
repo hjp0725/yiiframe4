@@ -26,6 +26,9 @@ use yii\helpers\StringHelper;
  */
 class Generator extends \yiiframe\gii\Generator
 {
+    public $listFields;
+    public $formFields;
+    public $inputType;
     const RELATIONS_NONE = 'none';
     const RELATIONS_ALL = 'all';
     const RELATIONS_ALL_INVERSE = 'all-inverse';
@@ -48,6 +51,28 @@ class Generator extends \yiiframe\gii\Generator
     public $queryBaseClass = 'yii\db\ActiveQuery';
     public $template = 'yiiframe';
     public $enableI18N = true;
+
+    public function beforeValidate()
+    {
+        parent::beforeValidate();
+
+        /* 如果是字符串（CLI），就解码 */
+        if (is_string($this->listFields)) {
+            $this->listFields = json_decode($this->listFields, true) ?: [];
+        }
+        if (is_string($this->formFields)) {
+            $this->formFields = json_decode($this->formFields, true) ?: [];
+        }
+        if (is_string($this->inputType)) {
+            $this->inputType  = json_decode($this->inputType, true)  ?: [];
+        }
+        /* 防止 null */
+        $this->listFields = (array)$this->listFields;
+        $this->formFields = (array)$this->formFields;
+        $this->inputType  = (array)$this->inputType;
+
+        return true;
+    }
     /**
      * {@inheritdoc}
      */
@@ -87,6 +112,8 @@ class Generator extends \yiiframe\gii\Generator
             [['generateLabelsFromComments', 'useTablePrefix', 'useSchemaName', 'generateQuery', 'generateRelationsFromCurrentSchema'], 'boolean'],
             [['enableI18N', 'standardizeCapitals', 'singularize'], 'boolean'],
             [['messageCategory'], 'validateMessageCategory', 'skipOnEmpty' => false],
+            [['listFields', 'formFields', 'inputType'], 'safe'],
+
         ]);
     }
 
@@ -112,8 +139,7 @@ class Generator extends \yiiframe\gii\Generator
             'queryBaseClass' => Yii::t('app','ActiveQuery基类'),
             'useSchemaName' => Yii::t('app','使用模式名称'),
             'useTablePrefix' => Yii::t('app','使用表前缀'),
-
-            
+            'listFields' => Yii::t('app', '列表字段'),
         ]);
     }
 
@@ -296,6 +322,7 @@ class Generator extends \yiiframe\gii\Generator
         $labels = [];
         foreach ($table->columns as $column) {
             if ($this->generateLabelsFromComments && !empty($column->comment)) {
+                // 只保留冒号前文字，没有冒号就整段返回
                 $labels[$column->name] = strpos($column->comment, ':') !== false
                     ? explode(':', $column->comment, 2)[0]
                     : $column->comment;
@@ -1007,5 +1034,54 @@ class Generator extends \yiiframe\gii\Generator
         }
 
         return false;
+    }
+
+    /**
+     * 公共：把 "类型:1=体育新闻,2=娱乐新闻" 解析成 [1=>'体育新闻',...]
+     * 失败返回空数组
+     */
+    public function parseCommentToMap($comment)
+    {
+        if (preg_match('/^([^:]+):(.+)$/', $comment, $m)) {
+            $map = [];
+            foreach (explode(',', $m[2]) as $pair) {
+                if (strpos($pair, '=') === false) {
+                    continue;
+                }
+                list($key, $val) = explode('=', trim($pair));
+                $map[trim($key)] = trim($val);
+            }
+            return $map;
+        }
+        return [];
+    }
+    /**
+     * 根据「linkTable 值」反推模型完整类名
+     * 例：addon_ceshi_cate → \addons\Ceshi\common\models\CeshiCate
+     * 系统表：yii_backend_member → \common\models\backend\Member
+     */
+    public function getRelationModelClass($linkTable)
+    {
+        $prefix      = \Yii::$app->db->tablePrefix;
+        $addonPrefix = $prefix . 'addon_';
+
+        /* ========== 1. 系统表分支 ========== */
+        if (strpos($linkTable, 'yii_backend_') === 0) {
+            // 完整表名 → 类名映射表（可继续追加）
+            $map = [
+                'yii_backend_member'      => '\common\models\backend\Member',
+                'yii_backend_department'  => '\common\models\backend\Department',
+                'yii_member'        => '\addons\Member\common\models\Member',
+                'yii_merchant_member'        => '\addons\Merchants\common\models\Member',
+                'yii_merchant_department'         => '\addons\Merchants\common\models\Department',
+            ];
+            return $map[$linkTable] ?? '';
+        }
+
+        /* ========== 2. 原插件分支（无改动） ========== */
+        $rawName    = preg_replace('#^' . preg_quote($addonPrefix, '#') . '#', '', $linkTable);
+        $pluginName = ucfirst(explode('_', $rawName)[0]);
+        $modelName  = str_replace(' ', '', ucwords(str_replace('_', ' ', $rawName)));
+        return "\\addons\\{$pluginName}\\common\\models\\{$modelName}";
     }
 }

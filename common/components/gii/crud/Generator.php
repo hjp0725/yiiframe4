@@ -103,7 +103,6 @@ class Generator extends \yiiframe\gii\generators\crud\Generator
         }
         return [];
     }
-    
     /**
      * 根据「linkTable 值」反推模型完整类名
      * 例：addon_ceshi_cate → \addons\Ceshi\common\models\CeshiCate

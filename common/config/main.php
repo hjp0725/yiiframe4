@@ -103,6 +103,8 @@ return [
         'httpClient' => [
             'class' => 'yii\httpclient\Client',
         ],
-        
+        'workflowSource' => [
+            'class' => 'addons\Workflow\common\components\WorkflowDbSource',
+        ],
     ],
 ];

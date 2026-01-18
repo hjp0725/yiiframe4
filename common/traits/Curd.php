@@ -46,7 +46,6 @@ trait Curd
             'pageSize'               => $this->pageSize,
         ]);
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-        $dataProvider->query->andWhere([$this->modelClass::tableName() .'.status'=>\common\enums\StatusEnum::ENABLED]);
         $dataProvider->query->andFilterWhere([$this->modelClass::tableName() .'.merchant_id'=>Yii::$app->user->identity->merchant_id]);
         if (!Yii::$app->services->auth->isSuperAdmin()&&!Yii::$app->services->auth->isSystemAdmin()) {
             $dataProvider->query->andWhere([$this->modelClass::tableName(). '.member_id' => Yii::$app->user->id]);
@@ -150,7 +149,16 @@ trait Curd
 
         return $this->renderAjax($this->action->id, ['model' => $model]);
     }
-
+    /**
+     * 导出
+     */
+    public function actionExport()
+    {
+        $result = Yii::createObject($this->modelClass.'Export'::class)->export(Yii::$app->request->get());
+        if ($result === false) {
+            return $this->message('没有可导出的数据', $this->redirect(Yii::$app->request->referrer));
+        }
+    }
     /* -------------------- 辅助 -------------------- */
 
     /**

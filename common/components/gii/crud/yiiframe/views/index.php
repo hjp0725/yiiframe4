@@ -87,21 +87,24 @@ if (($tableSchema = $generator->getTableSchema()) === false) {
     foreach ($tableSchema->columns as $column) {
         /* ====== 如果用户把 created_at 列勾进列表，就走日期范围筛选 ====== */
         if ($column->name === 'created_at' && in_array('created_at', $listFields, true)) {
-            echo "            [\n";
-            echo "                'attribute' => 'created_at',\n";
-            echo "                'filter'    => \\kartik\\daterange\\DateRangePicker::widget([\n";
-            echo "                    'name'  => 'SearchModel[dateRange]',\n";
-            echo "                    'value' => \$searchModel->dateRange ?? Yii::\$app->request->get('SearchModel')['dateRange'] ?? '',\n";
-            echo "                    'convertFormat' => true,\n";
-            echo "                    'pluginOptions' => [\n";
-            echo "                        'locale' => ['format' => 'Y-m-d', 'separator' => '/'],\n";
-            echo "                        'opens'  => 'left',\n";
-            echo "                    ],\n";
-            echo "                ]),\n";
-            echo "                'value' => function (\$model) {\n";
-            echo "                    return date('Y-m-d H:i:s', \$model->created_at);\n";
-            echo "                },\n";
-            echo "            ],\n";
+            echo "            [
+                'attribute' => 'created_at',
+                'filter' => DateRangePicker::widget([
+                    'name' => 'SearchModel[dateRange]',
+                    'value' => Yii::\$app->request->get('SearchModel')['dateRange'],
+                    'convertFormat' => true,
+                    'pluginOptions' => [
+                        'locale' => [
+                            'format' => 'Y-m-d',
+                            'separator' => '/',
+                        ],
+                        'opens'  => 'left',
+                    ]
+                ]),
+                'value' => function (\$model) {
+                    return date('Y-m-d H:i:s', \$model->created_at);
+                },
+            ],\n";
             continue;   // 已经输出完毕，直接跳过后面默认逻辑
         }elseif($column->name=='member_id' && in_array('member_id', $listFields, true)){
             echo "            [
@@ -156,7 +159,7 @@ if (($tableSchema = $generator->getTableSchema()) === false) {
                     
                     if (!is_array(\$ids) || !\$ids) return Yii::t('addon','未知');
 
-                    \$map   = Yii::\$app->services->devPattern->member()::dropDown();
+                    \$map   = $itemsCode;
                     \$names = array_filter(array_map(function (\$id) use (\$map) {
                         return \$map[\$id] ?? '';
                     }, \$ids));
@@ -166,7 +169,7 @@ if (($tableSchema = $generator->getTableSchema()) === false) {
                 'filter' => Html::dropDownList(
                     '".$column->name."',
                     Yii::\$app->request->get('".$column->name."'), 
-                    Yii::\$app->services->devPattern->member()::dropDown(), 
+                    $itemsCode, 
                     ['prompt' => Yii::t('addon','全部'), 'class' => 'form-control', 'onchange' => 'this.form.submit()']
                 ),
             ],\n";

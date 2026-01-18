@@ -26,6 +26,7 @@ if (YII_ENV_DEV) {
                 'class' => \common\components\gii\model\Generator::class,
                 'templates' => [
                     'yiiframe' => '@common/components/gii/model/yiiframe',
+                    'export' => '@common/components/gii/model/export',
                     'default' => '@vendor/yii2framework/yiiframe-gii/src/generators/model/default',
                 ]
             ],
