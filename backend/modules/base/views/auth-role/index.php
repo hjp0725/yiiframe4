@@ -1,0 +1,80 @@
+<?php
+
+use common\helpers\Url;
+use common\helpers\Html;
+use jianyan\treegrid\TreeGrid;
+
+$this->title = Yii::t('app', '角色管理');
+$this->params['breadcrumbs'][] = ['label' => $this->title];
+
+?>
+
+<div class="row">
+    <div class="col-12">
+        <div class="box">
+            <div class="box-header">
+                <h2 style="font-size: 18px;padding-top: 0;margin-top: 0">
+                    <i class="icon ion-android-apps"></i>
+                    <?= $this->title; ?>
+                </h2>
+                <div class="box-tools">
+                    <?= Html::create(['edit','merchant_id' => $merchant_id] ); ?>
+                </div>
+            </div>
+            <div class="box-body table-responsive">
+                <?= Treegrid::widget([
+                    'dataProvider' => $dataProvider,
+                    'keyColumnName' => 'id',
+                    'parentColumnName' => 'pid',
+                    'parentRootValue' => $role['id'] ?? 0, // first parentId value
+                    'pluginOptions' => [
+                        'initialState' => 'expanded',
+                    ],
+                    'options' => ['class' => 'table table-hover'],
+                    'columns' => [
+                        [
+                            'attribute' => 'title',
+                            'format' => 'raw',
+                            'value' => function ($model, $key, $index, $column) use ($merchant_id) {
+                                $str = Html::tag('span', $model['title'], [
+                                    'class' => 'm-l-sm',
+                                ]);
+                                $str .= Html::a(' <i class="iconfont iconplus-circle"></i>',
+                                    ['edit', 'pid' => $model['id'], 'merchant_id' => $merchant_id]);
+
+                                return $str;
+                            },
+                        ],
+                        [
+                            'attribute' => 'sort',
+                            'format' => 'raw',
+                            'value' => function ($model, $key, $index, $column) {
+                                return Html::sort($model['sort']);
+                            },
+                            // 'headerOptions' => ['class' => 'col-md-1'],
+                            
+                        ],
+                        [
+                            'header' =>Yii::t('app', '操作'),
+                            'class' => 'yii\grid\ActionColumn',
+                            'template' => '{status} {edit} {delete}',
+                            'buttons' => [
+
+                                'status' => function ($url, $model, $key) {
+                                    return Html::status($model['status']);
+                                },
+                                'edit' => function ($url, $model, $key) use ($merchant_id) {
+                                    return Html::edit(['edit', 'id' => $model['id'], 'merchant_id' => $merchant_id]);
+                                },
+                                'delete' => function ($url, $model, $key) use ($merchant_id) {
+                                    return Html::delete(['delete', 'id' => $model['id'], 'merchant_id' => $merchant_id,
+                                    ]);
+                                },
+                            ],
+                        ],
+                    ],
+                ]); ?>
+            </div>
+        </div>
+    </div>
+</div>
