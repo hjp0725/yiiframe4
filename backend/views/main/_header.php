@@ -99,7 +99,7 @@ $menuCates = Yii::$app->services->menuCate->getOnAuthList();
             </a>
         </li>
         <li class="nav-item">
-            <a href="<?= BaseUrl::to(['site/logout']); ?>" data-method="post" class="nav-link"><i class="iconfont icontuichu"  style="font-size:14px"></i> <?=Yii::t('app','退出');?></a>
+            <a href="<?= BaseUrl::to(['site/logout']); ?>" data-method="post" class="nav-link"><i class="fas fa-power-off"  style="font-size:14px"></i> <?=Yii::t('app','退出');?></a>
         </li>
         <li class="nav-item hide">
             <a class="nav-link" data-widget="control-sidebar" data-slide="true" href="#" role="button">
