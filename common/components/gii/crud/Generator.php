@@ -126,7 +126,7 @@ class Generator extends \yiiframe\gii\generators\crud\Generator
         $addonPrefix = $prefix . 'addon_';
 
         /* ========== 1. 系统表分支 ========== */
-        if (strpos($linkTable, 'yii_backend_') === 0) {
+        if (strpos($linkTable, $addonPrefix) !== 0) {
             // 完整表名 → 类名映射表（可继续追加）
             $map = [
                 'yii_backend_member'      => '\common\models\backend\Member',
