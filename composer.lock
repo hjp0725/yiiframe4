@@ -9118,12 +9118,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/yii2framework/yiiframe-plugs.git",
-                "reference": "a12bfffd454bf64d5ce11e0b079c4fdcf94d42ef"
+                "reference": "723ccac15a29ca50236bb882d3d54e746443a73f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/yii2framework/yiiframe-plugs/zipball/a12bfffd454bf64d5ce11e0b079c4fdcf94d42ef",
-                "reference": "a12bfffd454bf64d5ce11e0b079c4fdcf94d42ef",
+                "url": "https://api.github.com/repos/yii2framework/yiiframe-plugs/zipball/723ccac15a29ca50236bb882d3d54e746443a73f",
+                "reference": "723ccac15a29ca50236bb882d3d54e746443a73f",
                 "shasum": "",
                 "mirrors": [
                     {
