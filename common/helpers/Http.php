@@ -48,16 +48,30 @@ class Http
      * @param string $url
      * @param array  $params
      * @param string $method
+     * @param string $headers
      * @return array
      * @throws NotFoundHttpException
      */
-    public static function sendRequest(string $url, array $params = [], string $method = 'POST'): array
+    public static function sendRequest(string $url, array $params = [], string $method = 'POST', array $headers = []): array
     {
         try {
             $client  = self::getClient();
-            $options = strtoupper($method) === 'POST'
-                ? ['form_params' => $params]
-                : ['query' => $params];
+            
+            // 合并默认 headers 和自定义 headers（自定义优先）
+            $requestHeaders = array_merge([
+                'X-REQUESTED-WITH' => 'XMLHttpRequest',
+                'User-Agent'       => 'FastAddon',
+            ], $headers);
+            
+            $options = [
+                'headers' => $requestHeaders,
+            ];
+            
+            if (strtoupper($method) === 'POST') {
+                $options['form_params'] = $params;
+            } else {
+                $options['query'] = $params;
+            }
 
             $response = $client->request($method, $url, $options);
             $content  = $response->getBody()->getContents();
